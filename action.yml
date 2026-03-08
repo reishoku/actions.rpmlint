@@ -25,68 +25,48 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Install rpmlint
-      shell: bash
-      run: |
-        sudo apt-get -qq update
-        sudo apt-get -qq install -y \
-          --no-install-suggests \
-          rpmlint
-
-    - name: Find spec files
+    - name: Prepare runner
       shell: bash
       env:
         LANG: C
         INPUT_PATH: ${{ inputs.path }}
         INPUT_DEPTH: ${{ inputs.depth }}
+        INPUT_CONFIG: ${{ inputs.config }}
       run: |
         set -euo pipefail
+        sudo apt-get -qq update
+        sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_SUSPEND=y \
+          apt-get -qq install -y \
+          --no-install-suggests \
+          rpmlint
         SPEC_LIST="${RUNNER_TEMP}/spec-files.txt"
         find "${INPUT_PATH}" \
           -mindepth 1 -maxdepth "${INPUT_DEPTH}" \
           -type f -name '*.spec' ! -empty \
           -print | sort > "${SPEC_LIST}"
-        {
-          echo "SPEC_LIST=${SPEC_LIST}"
-          echo "SPEC_COUNT=$(wc -l < "${SPEC_LIST}")"
-        } >> "${GITHUB_ENV}"
-
-    - name: List found spec files
-      if: env.SPEC_COUNT != '0'
-      shell: bash
-      env:
-        LANG: C
-      run: |
-        echo "::notice::Found ${SPEC_COUNT} spec file(s)"
-        while IFS= read -r f; do
-          echo "::notice file=${f}::${f}"
-        done < "${SPEC_LIST}"
-
-    - name: Warn if no spec files found
-      if: env.SPEC_COUNT == '0'
-      shell: bash
-      env:
-        LANG: C
-        INPUT_PATH: ${{ inputs.path }}
-      run: |
-        echo "::warning::No spec files found in '${INPUT_PATH}'"
-
-    - name: Check rpmlint configuration
-      if: env.SPEC_COUNT != '0'
-      shell: bash
-      env:
-        LANG: C
-        INPUT_CONFIG: ${{ inputs.config }}
-      run: |
+        SPEC_COUNT="$(wc -l < "${SPEC_LIST}")"
+        if [ "${SPEC_COUNT}" -eq 0 ]; then
+          echo "::warning::No spec files found in '${INPUT_PATH}'"
+        else
+          echo "::notice::Found ${SPEC_COUNT} spec file(s)"
+          while IFS= read -r f; do
+            echo "::notice file=${f}::${f}"
+          done < "${SPEC_LIST}"
+        fi
         if [ -f "${INPUT_CONFIG}" ]; then
           echo "RPMLINT_CONFIG=-c ${INPUT_CONFIG}" >> "${GITHUB_ENV}"
         fi
+        {
+          echo "SPEC_LIST=${SPEC_LIST}"
+          echo "SPEC_COUNT=${SPEC_COUNT}"
+        } >> "${GITHUB_ENV}"
 
     - name: Run rpmlint
       if: env.SPEC_COUNT != '0'
       shell: bash
       env:
         LANG: C
+        COLUMNS: '60'
         INPUT_STRICT: ${{ inputs.strict }}
       run: |
         strict_flag=""
