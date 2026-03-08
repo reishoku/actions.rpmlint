@@ -30,12 +30,13 @@ steps:
 |------|-------------|----------|---------|
 | `config` | Path to rpmlint configuration file | No | `.rpmlint.toml` |
 | `path` | Directory to search for spec files | No | `.` |
+| `depth` | Maximum directory depth to search (1 = current directory only) | No | `1` |
 | `strict` | Treat warnings as errors (`--strict`) | No | `false` |
 
 ## Behavior
 
 - Installs `rpmlint` 2.5.0 from the Ubuntu 24.04 apt repository (not from PyPI).
-- Searches for `*.spec` files in the specified directory (non-recursive).
+- Searches for `*.spec` files in the specified directory up to the configured depth.
 - If a configuration file is found at the specified path, it is passed to rpmlint with `-c`.
 - If no spec files are found, a warning is emitted and the step succeeds.
 - Runs on Ubuntu-based GitHub-hosted runners.

@@ -13,6 +13,10 @@ inputs:
     description: Directory to search for spec files
     required: false
     default: .
+  depth:
+    description: Maximum directory depth to search for spec files (1 = current directory only)
+    required: false
+    default: '1'
   strict:
     description: Treat warnings as errors (--strict)
     required: false
@@ -44,9 +48,10 @@ runs:
       shell: bash
       env:
         INPUT_PATH: ${{ inputs.path }}
+        INPUT_DEPTH: ${{ inputs.depth }}
       run: |
         set -euo pipefail
-        count="$(find "${INPUT_PATH}" -mindepth 1 -maxdepth 1 -type f -name '*.spec' -ls | tee /dev/stderr | wc -l)"
+        count="$(find "${INPUT_PATH}" -mindepth 1 -maxdepth "${INPUT_DEPTH}" -type f -name '*.spec' -ls | tee /dev/stderr | wc -l)"
         if [ "${count}" -eq 0 ]; then
           echo "::warning::No spec files found in '${INPUT_PATH}'"
         fi
@@ -58,6 +63,7 @@ runs:
       env:
         CONFIG_ARGS: ${{ steps.config.outputs.args }}
         INPUT_PATH: ${{ inputs.path }}
+        INPUT_DEPTH: ${{ inputs.depth }}
         INPUT_STRICT: ${{ inputs.strict }}
       run: |
         strict_flag=""
@@ -65,5 +71,5 @@ runs:
           strict_flag="--strict"
         fi
         # shellcheck disable=SC2086
-        find "${INPUT_PATH}" -mindepth 1 -maxdepth 1 -type f -name '*.spec' \
+        find "${INPUT_PATH}" -mindepth 1 -maxdepth "${INPUT_DEPTH}" -type f -name '*.spec' \
           -exec rpmlint ${CONFIG_ARGS} ${strict_flag} {} +
