@@ -94,6 +94,6 @@ runs:
         if [ "${INPUT_STRICT}" = "true" ]; then
           strict_flag="--strict"
         fi
+        mapfile -t specs < "${RUNNER_TEMP}/spec-files.txt"
         # shellcheck disable=SC2086
-        xargs rpmlint ${CONFIG_ARGS} ${strict_flag} \
-          < "${RUNNER_TEMP}/spec-files.txt"
+        rpmlint ${CONFIG_ARGS} ${strict_flag} "${specs[@]}"
