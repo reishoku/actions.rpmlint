@@ -1,0 +1,63 @@
+name: Test action
+
+on:
+  pull_request:
+    paths:
+      - 'action.yml'
+      - '.github/workflows/test.yml'
+      - 'tests/**'
+  push:
+    branches:
+      - reishoku
+    paths:
+      - 'action.yml'
+      - '.github/workflows/test.yml'
+      - 'tests/**'
+  workflow_dispatch:
+
+jobs:
+  test-default:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run rpmlint action (default)
+        uses: ./
+        with:
+          path: tests
+
+  test-strict:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run rpmlint action (strict)
+        uses: ./
+        with:
+          path: tests
+          strict: 'true'
+
+  test-no-spec:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run rpmlint action (no spec files)
+        uses: ./
+        with:
+          path: .github
+
+  test-custom-config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run rpmlint action (custom config)
+        uses: ./
+        with:
+          path: tests
+          config: tests/.rpmlint.toml
