@@ -35,6 +35,7 @@ runs:
       id: config
       shell: bash
       env:
+        LANG: C
         INPUT_CONFIG: ${{ inputs.config }}
       run: |
         if [ -f "${INPUT_CONFIG}" ]; then
@@ -45,6 +46,7 @@ runs:
       id: find-spec
       shell: bash
       env:
+        LANG: C
         INPUT_PATH: ${{ inputs.path }}
         INPUT_DEPTH: ${{ inputs.depth }}
       run: |
@@ -65,6 +67,7 @@ runs:
       if: steps.find-spec.outputs.count != '0'
       shell: bash
       env:
+        LANG: C
         CONFIG_ARGS: ${{ steps.config.outputs.args }}
         INPUT_PATH: ${{ inputs.path }}
         INPUT_DEPTH: ${{ inputs.depth }}
