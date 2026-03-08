@@ -20,6 +20,8 @@ indent_size = 2
 
 [*.md]
 trim_trailing_whitespace = false
+# Markdown files naturally contain long lines (URLs, tables)
+max_line_length = off
 
 [Makefile]
 indent_style = tab
