@@ -24,10 +24,6 @@ runs:
     - name: Set up uv
       uses: astral-sh/setup-uv@v7
 
-    - name: Install rpmlint
-      shell: bash
-      run: uv pip install --system -q rpmlint
-
     - name: Check rpmlint configuration
       id: config
       shell: bash
@@ -67,4 +63,4 @@ runs:
         fi
         # shellcheck disable=SC2086
         find "${INPUT_PATH}" -mindepth 1 -maxdepth 1 -type f -name '*.spec' \
-          -exec rpmlint ${CONFIG_ARGS} ${strict_flag} {} +
+          -exec uvx rpmlint ${CONFIG_ARGS} ${strict_flag} {} +
