@@ -56,8 +56,10 @@ runs:
         if [ "${count}" -eq 0 ]; then
           echo "::warning::No spec files found in '${INPUT_PATH}'"
         else
-          echo "Found ${count} spec file(s):"
-          printf '%s\n' "${specs}"
+          echo "::notice::Found ${count} spec file(s)"
+          printf '%s\n' "${specs}" | while IFS= read -r f; do
+            echo "::notice file=${f}::${f}"
+          done
         fi
         echo "count=${count}" >> "${GITHUB_OUTPUT}"
 
