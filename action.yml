@@ -34,7 +34,6 @@ runs:
           rpmlint
 
     - name: Find spec files
-      id: find-spec
       shell: bash
       env:
         LANG: C
@@ -42,27 +41,29 @@ runs:
         INPUT_DEPTH: ${{ inputs.depth }}
       run: |
         set -euo pipefail
+        SPEC_LIST="${RUNNER_TEMP}/spec-files.txt"
         find "${INPUT_PATH}" \
           -mindepth 1 -maxdepth "${INPUT_DEPTH}" \
           -type f -name '*.spec' ! -empty \
-          -print | sort > "${RUNNER_TEMP}/spec-files.txt"
-        count="$(wc -l < "${RUNNER_TEMP}/spec-files.txt")"
-        echo "count=${count}" >> "${GITHUB_OUTPUT}"
+          -print | sort > "${SPEC_LIST}"
+        {
+          echo "SPEC_LIST=${SPEC_LIST}"
+          echo "SPEC_COUNT=$(wc -l < "${SPEC_LIST}")"
+        } >> "${GITHUB_ENV}"
 
     - name: List found spec files
-      if: steps.find-spec.outputs.count != '0'
+      if: env.SPEC_COUNT != '0'
       shell: bash
       env:
         LANG: C
       run: |
-        count="$(wc -l < "${RUNNER_TEMP}/spec-files.txt")"
-        echo "::notice::Found ${count} spec file(s)"
+        echo "::notice::Found ${SPEC_COUNT} spec file(s)"
         while IFS= read -r f; do
           echo "::notice file=${f}::${f}"
-        done < "${RUNNER_TEMP}/spec-files.txt"
+        done < "${SPEC_LIST}"
 
     - name: Warn if no spec files found
-      if: steps.find-spec.outputs.count == '0'
+      if: env.SPEC_COUNT == '0'
       shell: bash
       env:
         LANG: C
@@ -71,29 +72,27 @@ runs:
         echo "::warning::No spec files found in '${INPUT_PATH}'"
 
     - name: Check rpmlint configuration
-      id: config
-      if: steps.find-spec.outputs.count != '0'
+      if: env.SPEC_COUNT != '0'
       shell: bash
       env:
         LANG: C
         INPUT_CONFIG: ${{ inputs.config }}
       run: |
         if [ -f "${INPUT_CONFIG}" ]; then
-          echo "args=-c ${INPUT_CONFIG}" >> "${GITHUB_OUTPUT}"
+          echo "RPMLINT_CONFIG=-c ${INPUT_CONFIG}" >> "${GITHUB_ENV}"
         fi
 
     - name: Run rpmlint
-      if: steps.find-spec.outputs.count != '0'
+      if: env.SPEC_COUNT != '0'
       shell: bash
       env:
         LANG: C
-        CONFIG_ARGS: ${{ steps.config.outputs.args }}
         INPUT_STRICT: ${{ inputs.strict }}
       run: |
         strict_flag=""
         if [ "${INPUT_STRICT}" = "true" ]; then
           strict_flag="--strict"
         fi
-        mapfile -t specs < "${RUNNER_TEMP}/spec-files.txt"
+        mapfile -t specs < "${SPEC_LIST}"
         # shellcheck disable=SC2086
-        rpmlint ${CONFIG_ARGS} ${strict_flag} "${specs[@]}"
+        rpmlint ${RPMLINT_CONFIG:-} ${strict_flag} "${specs[@]}"
