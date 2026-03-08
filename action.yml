@@ -1,0 +1,70 @@
+name: rpmlint
+description: Run rpmlint on RPM spec files
+branding:
+  icon: check-circle
+  color: blue
+
+inputs:
+  config:
+    description: Path to rpmlint configuration file
+    required: false
+    default: .rpmlint.toml
+  path:
+    description: Directory to search for spec files
+    required: false
+    default: .
+  strict:
+    description: Treat warnings as errors (--strict)
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v7
+
+    - name: Install rpmlint
+      shell: bash
+      run: uv pip install --system -q rpmlint
+
+    - name: Check rpmlint configuration
+      id: config
+      shell: bash
+      env:
+        INPUT_CONFIG: ${{ inputs.config }}
+      run: |
+        if [ -f "${INPUT_CONFIG}" ]; then
+          echo "args=-c ${INPUT_CONFIG}" >> "${GITHUB_OUTPUT}"
+        else
+          echo "::warning::rpmlint config '${INPUT_CONFIG}' not found; running with default configuration"
+        fi
+
+    - name: Find spec files
+      id: find-spec
+      shell: bash
+      env:
+        INPUT_PATH: ${{ inputs.path }}
+      run: |
+        set -euo pipefail
+        count="$(find "${INPUT_PATH}" -mindepth 1 -maxdepth 1 -type f -name '*.spec' -ls | tee /dev/stderr | wc -l)"
+        if [ "${count}" -eq 0 ]; then
+          echo "::warning::No spec files found in '${INPUT_PATH}'"
+        fi
+        echo "count=${count}" >> "${GITHUB_OUTPUT}"
+
+    - name: Run rpmlint
+      if: steps.find-spec.outputs.count != '0'
+      shell: bash
+      env:
+        CONFIG_ARGS: ${{ steps.config.outputs.args }}
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_STRICT: ${{ inputs.strict }}
+      run: |
+        strict_flag=""
+        if [ "${INPUT_STRICT}" = "true" ]; then
+          strict_flag="--strict"
+        fi
+        # shellcheck disable=SC2086
+        find "${INPUT_PATH}" -mindepth 1 -maxdepth 1 -type f -name '*.spec' \
+          -exec rpmlint ${CONFIG_ARGS} ${strict_flag} {} +

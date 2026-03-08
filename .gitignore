@@ -1,0 +1,37 @@
+# Backup files
+*.bak
+*.orig
+*.temp
+*.tmp
+
+# Logs
+*.log
+
+# macOS
+._*
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Linux
+*~
+.Trash-*
+
+# Vim / Neovim
+*.swp
+*.swo
+*.swn
+
+# Emacs
+.\#*
+\#*\#
+
+# VSCode
+.vscode/
+
+# JetBrains
+.idea/
+
+# Claude Code
+**/.claude/settings.local.json
