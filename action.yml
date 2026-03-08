@@ -51,7 +51,7 @@ runs:
         INPUT_DEPTH: ${{ inputs.depth }}
       run: |
         set -euo pipefail
-        specs="$(find "${INPUT_PATH}" -mindepth 1 -maxdepth "${INPUT_DEPTH}" -type f -name '*.spec' -print | sort)"
+        specs="$(find "${INPUT_PATH}" -mindepth 1 -maxdepth "${INPUT_DEPTH}" -type f -name '*.spec' ! -empty -print | sort)"
         count="$(printf '%s\n' "${specs}" | grep -c . || true)"
         if [ "${count}" -eq 0 ]; then
           echo "::warning::No spec files found in '${INPUT_PATH}'"
@@ -77,5 +77,5 @@ runs:
           strict_flag="--strict"
         fi
         # shellcheck disable=SC2086
-        find "${INPUT_PATH}" -mindepth 1 -maxdepth "${INPUT_DEPTH}" -type f -name '*.spec' \
+        find "${INPUT_PATH}" -mindepth 1 -maxdepth "${INPUT_DEPTH}" -type f -name '*.spec' ! -empty \
           -exec rpmlint ${CONFIG_ARGS} ${strict_flag} {} +
