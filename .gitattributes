@@ -1,3 +1,2 @@
 .editorconfig linguist-language=TOML
-.shellcheckrc linguist-language=Shell
 .yamllint linguist-language=YAML
