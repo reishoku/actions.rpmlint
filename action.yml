@@ -21,16 +21,12 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Install RPM Python bindings
+    - name: Install rpmlint and dependencies
       shell: bash
-      run: sudo apt-get -qq update && sudo apt-get -qq install -y --no-install-suggests python3-rpm > /dev/null
-
-    - name: Set up uv
-      uses: astral-sh/setup-uv@v7
-
-    - name: Install rpmlint
-      shell: bash
-      run: uv pip install --system --break-system-packages -q rpmlint
+      run: |
+        sudo apt-get -qq update
+        sudo apt-get -qq install -y --no-install-suggests python3-rpm python3-pip > /dev/null
+        pip install --break-system-packages -q rpmlint
 
     - name: Check rpmlint configuration
       id: config
