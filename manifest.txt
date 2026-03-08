@@ -1,2 +1,2 @@
-# renovate: datasource=deb depName=yamllint versioning=deb
-yamllint 1.33.0-1
+# renovate: datasource=deb depName=rpmlint versioning=deb
+rpmlint 2.5.0+ds1-0.1
