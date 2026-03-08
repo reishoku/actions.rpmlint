@@ -16,9 +16,9 @@ tests/.rpmlint.toml     # Test rpmlint configuration
 
 ## Key design decisions
 
-- **rpmlint is installed from the Ubuntu apt repository** (`apt-get install rpmlint`), not from PyPI. This avoids PEP 668 / `--break-system-packages` issues and ensures the RPM Python bindings (`python3-rpm`) are available in the same Python environment.
+- **rpmlint is installed from the Ubuntu apt repository** (`apt-get install rpmlint`), not from PyPI. The RPM Python bindings (`python3-rpm`) are pulled in as a dependency automatically.
 - **The action runs on Ubuntu-based GitHub-hosted runners only.** The rpmlint version is tied to the Ubuntu release (currently 2.5.0 on Ubuntu 24.04).
-- **No external GitHub Actions dependencies** in the action itself. The `astral-sh/setup-uv` action is not used; installation is done purely via apt.
+- **No external GitHub Actions dependencies** in the action itself. Installation is done purely via apt.
 - **Spec file search is non-recursive** (`-maxdepth 1` in find). The `path` input controls which directory to search.
 
 ## Action inputs
