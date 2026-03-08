@@ -34,7 +34,7 @@ steps:
 
 ## Behavior
 
-- Installs `python3-rpm` (RPM Python bindings) and `rpmlint` via pip.
+- Installs `rpmlint` from the Ubuntu apt repository (not from PyPI).
 - Searches for `*.spec` files in the specified directory (non-recursive).
 - If a configuration file is found at the specified path, it is passed to rpmlint with `-c`.
 - If no spec files are found, a warning is emitted and the step succeeds.
