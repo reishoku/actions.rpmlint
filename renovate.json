@@ -1,0 +1,13 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/manifest\\.txt$/"],
+      "matchStrings": [
+        "#\\s*renovate:\\s*datasource=(?<datasource>.*?)\\s+depName=(?<depName>.*?)\\s+versioning=(?<versioning>.*?)\\s*\\n\\S+\\s+(?<currentValue>\\S+)"
+      ],
+      "registryUrlTemplate": "https://archive.ubuntu.com/ubuntu?suite=noble&components=main,universe&binaryArch=amd64"
+    }
+  ]
+}
