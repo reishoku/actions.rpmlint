@@ -29,7 +29,9 @@ runs:
       shell: bash
       run: |
         sudo apt-get -qq update
-        sudo apt-get -qq install -y --no-install-suggests rpmlint
+        sudo apt-get -qq install -y \
+          --no-install-suggests \
+          rpmlint
 
     - name: Check rpmlint configuration
       id: config
@@ -51,8 +53,12 @@ runs:
         INPUT_DEPTH: ${{ inputs.depth }}
       run: |
         set -euo pipefail
-        specs="$(find "${INPUT_PATH}" -mindepth 1 -maxdepth "${INPUT_DEPTH}" -type f -name '*.spec' ! -empty -print | sort)"
-        count="$(printf '%s\n' "${specs}" | grep -c . || true)"
+        specs="$(find "${INPUT_PATH}" \
+          -mindepth 1 -maxdepth "${INPUT_DEPTH}" \
+          -type f -name '*.spec' ! -empty \
+          -print | sort)"
+        count="$(printf '%s\n' "${specs}" \
+          | grep -c . || true)"
         if [ "${count}" -eq 0 ]; then
           echo "::warning::No spec files found in '${INPUT_PATH}'"
         else
@@ -78,5 +84,7 @@ runs:
           strict_flag="--strict"
         fi
         # shellcheck disable=SC2086
-        find "${INPUT_PATH}" -mindepth 1 -maxdepth "${INPUT_DEPTH}" -type f -name '*.spec' ! -empty \
+        find "${INPUT_PATH}" \
+          -mindepth 1 -maxdepth "${INPUT_DEPTH}" \
+          -type f -name '*.spec' ! -empty \
           -exec rpmlint ${CONFIG_ARGS} ${strict_flag} {} +
