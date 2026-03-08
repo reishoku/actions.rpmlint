@@ -51,9 +51,13 @@ runs:
         INPUT_DEPTH: ${{ inputs.depth }}
       run: |
         set -euo pipefail
-        count="$(find "${INPUT_PATH}" -mindepth 1 -maxdepth "${INPUT_DEPTH}" -type f -name '*.spec' -ls | tee /dev/stderr | wc -l)"
+        specs="$(find "${INPUT_PATH}" -mindepth 1 -maxdepth "${INPUT_DEPTH}" -type f -name '*.spec' -print | sort)"
+        count="$(printf '%s\n' "${specs}" | grep -c . || true)"
         if [ "${count}" -eq 0 ]; then
           echo "::warning::No spec files found in '${INPUT_PATH}'"
+        else
+          echo "Found ${count} spec file(s):"
+          printf '%s\n' "${specs}"
         fi
         echo "count=${count}" >> "${GITHUB_OUTPUT}"
 
