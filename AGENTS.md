@@ -19,7 +19,7 @@ tests/.rpmlint.toml     # Test rpmlint configuration
 - **rpmlint is installed from the Ubuntu apt repository** (`apt-get install rpmlint`), not from PyPI. The RPM Python bindings (`python3-rpm`) are pulled in as a dependency automatically.
 - **The action runs on Ubuntu-based GitHub-hosted runners only.** The rpmlint version is tied to the Ubuntu release (currently 2.5.0 on Ubuntu 24.04).
 - **No external GitHub Actions dependencies** in the action itself. Installation is done purely via apt.
-- **Spec file search is non-recursive** (`-maxdepth 1` in find). The `path` input controls which directory to search.
+- **Spec file search depth is configurable** via the `depth` input (default `1`, current directory only). The `path` input controls which directory to search.
 
 ## Action inputs
 
@@ -27,6 +27,7 @@ tests/.rpmlint.toml     # Test rpmlint configuration
 |-------|---------|-------------|
 | `config` | `.rpmlint.toml` | Path to rpmlint configuration file |
 | `path` | `.` | Directory to search for spec files |
+| `depth` | `1` | Maximum directory depth to search (1 = current directory only) |
 | `strict` | `false` | Treat warnings as errors (`--strict`) |
 
 ## Development guidelines
