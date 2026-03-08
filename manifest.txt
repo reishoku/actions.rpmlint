@@ -1,0 +1,2 @@
+# renovate: datasource=deb depName=yamllint versioning=deb
+yamllint 1.33.0-1
