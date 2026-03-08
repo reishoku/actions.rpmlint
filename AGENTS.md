@@ -52,8 +52,7 @@ tests/.rpmlint.toml     # Test rpmlint configuration
 - `editorconfig-checker` with `.editorconfig` for formatting
 - `shellcheck` with `.shellcheckrc` for shell scripts
 
-### Branching and workflow
+### Branching
 
 - Create topic branches for all changes.
-- PRs are merged with rebase and merge (`gh pr merge -r -d`).
 - The default branch is `reishoku`.
