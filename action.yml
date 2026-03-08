@@ -39,8 +39,6 @@ runs:
       run: |
         if [ -f "${INPUT_CONFIG}" ]; then
           echo "args=-c ${INPUT_CONFIG}" >> "${GITHUB_OUTPUT}"
-        else
-          echo "::warning::rpmlint config '${INPUT_CONFIG}' not found; running with default configuration"
         fi
 
     - name: Find spec files
