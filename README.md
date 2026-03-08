@@ -54,4 +54,4 @@ See `rpmlint --explain <check-id>` for details on individual checks.
 
 ## License
 
-This project is provided as-is without a formal license.
+[MIT](LICENSE)
